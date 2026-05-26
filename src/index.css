@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@700;900&family=Bungee&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-masala: "Bungee", cursive;
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  display: inline-block;
+}
+
+/* Cinematic Grain Effect */
+.bg-grain {
+  position: relative;
+}
+.bg-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.film-strip-edge {
+  background-image: radial-gradient(circle, #000 30%, transparent 30%);
+  background-size: 20px 20px;
+  background-position: center;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-black selection:bg-[#FFFF00] selection:text-black;
+  }
+}
+
+.brutal-shadow {
+  box-shadow: 8px 8px 0px 0px #000000;
+}
+
+.brutal-shadow-sm {
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.brutal-shadow-hover:hover {
+  box-shadow: 12px 12px 0px 0px #000000;
+  transform: translate(-4px, -4px);
+}
+
+.brutal-shadow-active:active {
+  box-shadow: 2px 2px 0px 0px #000000;
+  transform: translate(6px, 6px);
+}
+
+.pop-gradient {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.05),
+    rgba(0, 0, 0, 0.05) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+}
+
