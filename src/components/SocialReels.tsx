@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Instagram, Play } from 'lucide-react';
 import { Recommendation } from '../types';
 import { cn } from '../lib/utils';
+import { BrutalImage } from './BrutalImage';
 
 interface SocialReelsProps {
   recommendations: Recommendation[];
@@ -56,11 +57,16 @@ export const SocialReels: React.FC<SocialReelsProps> = ({ recommendations, isLoa
               transition={{ delay: idx * 0.1 }}
               className="group relative h-[300px] border-4 border-black bg-black overflow-hidden brutal-shadow-sm hover:brutal-shadow transition-all"
             >
-              <img 
-                src={`https://loremflickr.com/300/500/cinema,bollywood,vibe,${encodeURIComponent(item.image_keywords || 'aesthetic')}/all?lock=${idx}`} 
+              <BrutalImage
+                srcs={[
+                  `https://picsum.photos/seed/${encodeURIComponent(item.name.replace(/\W/g, ''))}social${idx}/300/500`,
+                  `https://loremflickr.com/300/500/cinema,bollywood,vibe,${encodeURIComponent(item.image_keywords || 'aesthetic')}/all?lock=${idx}`
+                ]}
                 alt={`${item.name} social`}
-                className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-500 scale-105 group-hover:scale-100"
-                referrerPolicy="no-referrer"
+                className="object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                aspectRatioClass="w-full h-full"
+                fallbackText={`${item.name} Reel`}
+                index={idx}
               />
               
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">

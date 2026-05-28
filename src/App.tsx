@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Film, RefreshCw, ChevronLeft, ArrowRight, MonitorPlay } from "lucide-react";
+import { Film, RefreshCw, ChevronLeft, ArrowRight, MonitorPlay, ArrowUp } from "lucide-react";
 import { Mood, UserPreferences, Recommendation, MOOD_CONFIGS, SocialVibe, Meme } from "./types";
 import { getRecommendations, getTrendingSocialVibes } from "./services/geminiService";
 import { MoodCard } from "./components/MoodCard";
@@ -9,6 +9,7 @@ import { RecommendationCard } from "./components/RecommendationCard";
 import { cn } from "./lib/utils";
 
 import { SocialReels } from "./components/SocialReels";
+import { BrutalImage } from "./components/BrutalImage";
 
 const INITIAL_PREFS: UserPreferences = {
   ageRange: "Adults (18+)",
@@ -23,6 +24,37 @@ const INITIAL_PREFS: UserPreferences = {
   yearRange: "Any",
 };
 
+function getMemeKeyword(meme: Meme): string {
+  const title = meme.title.toLowerCase();
+  const kw = meme.image_keywords ? meme.image_keywords.toLowerCase() : "";
+  
+  if (title.includes("logic") || kw.includes("confused") || kw.includes("physics") || title.includes("math")) {
+    return "confused";
+  }
+  if (title.includes("bgm") || title.includes("sound") || kw.includes("speakers") || kw.includes("dance") || kw.includes("party") || kw.includes("music")) {
+    return "dance";
+  }
+  if (title.includes("intro") || title.includes("action") || kw.includes("explosion") || kw.includes("hero") || kw.includes("fire") || kw.includes("fight")) {
+    return "explosion";
+  }
+  if (title.includes("parallel") || title.includes("expectation") || kw.includes("acting") || kw.includes("bollywood") || kw.includes("theatre") || title.includes("drama")) {
+    return "actor";
+  }
+  
+  // Try to find a single rich keyword from the comma-separated list
+  if (meme.image_keywords) {
+    const parted = meme.image_keywords.split(",");
+    for (const part of parted) {
+      const cleanPart = part.trim().toLowerCase();
+      if (cleanPart && !["meme", "funny", "aesthetic", "cinematic", "vs", "reality"].includes(cleanPart)) {
+        return cleanPart;
+      }
+    }
+  }
+  
+  return "cinema";
+}
+
 export default function App() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [prefs, setPrefs] = useState<UserPreferences>(INITIAL_PREFS);
@@ -35,6 +67,26 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [socialError, setSocialError] = useState<string | null>(null);
   const [animatedWordIndex, setAnimatedWordIndex] = useState(0);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
 
   const words = ["MOOD", "VIBE", "FEELING"];
 
@@ -165,6 +217,16 @@ export default function App() {
 
   const moodConfig = MOOD_CONFIGS[prefs.mood];
 
+  const trendingReels: Recommendation[] = socialVibes.slice(0, 4).map((v, idx) => ({
+    name: v.name,
+    ott: v.platform.toUpperCase(),
+    reason: v.description,
+    tagline: v.tag,
+    image_keywords: v.image_keywords,
+    socialHype: v.tag,
+    trendingTheme: v.name,
+  }));
+
   const handleMoodSelect = (mood: Mood) => {
     setPrefs(prev => ({ ...prev, mood, customMoodDescription: "" }));
   };
@@ -225,7 +287,7 @@ export default function App() {
           <div>
             <span className="font-masala text-4xl block leading-none">FILMY VIBES</span>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Gemini Masala Engine</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Masala Cine-Engine</span>
               <div className="bg-[#00FF00] text-black text-[8px] font-black px-2 py-0.5 border-2 border-black animate-pulse">CINEMATIC AI</div>
             </div>
           </div>
@@ -284,7 +346,7 @@ export default function App() {
                   <div className="bg-[#FFFF00] border-4 border-black p-8 -rotate-2 group-hover:rotate-0 transition-transform brutal-shadow text-center">
                     <p className="font-masala text-4xl md:text-6xl text-black">CRAFT YOUR SCENE</p>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-4">
-                      <p className="font-mono text-xs uppercase font-black bg-black text-white px-2 py-1">POWERED BY GEMINI</p>
+                      <p className="font-mono text-xs uppercase font-black bg-black text-white px-2 py-1">POWERED BY AI</p>
                       <p className="font-mono text-xs uppercase font-black bg-[#FF007F] text-white px-2 py-1">#CinematicAI</p>
                     </div>
                   </div>
@@ -428,11 +490,16 @@ export default function App() {
                               <div className="absolute top-2 left-2 z-20 bg-black text-white text-[8px] font-black px-2 py-0.5 border border-white/20 uppercase tracking-tighter">
                                 TOP TREND #{(idx + 1).toString().padStart(2, '0')}
                               </div>
-                              <img 
-                                src={`https://picsum.photos/seed/${meme.title.replace(/\W/g, '')}${idx}${refreshKey}/400/400`} 
-                                alt="meme" 
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
-                                referrerPolicy="no-referrer"
+                              <BrutalImage
+                                srcs={[
+                                  `https://picsum.photos/seed/${encodeURIComponent(meme.title.replace(/\W/g, ''))}${idx}${refreshKey}/400/400`,
+                                  `https://loremflickr.com/400/400/${getMemeKeyword(meme)}?lock=${idx + 1}`
+                                ]}
+                                alt={meme.title}
+                                className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                                aspectRatioClass="w-full h-full"
+                                fallbackText={meme.title}
+                                index={idx}
                               />
                             </div>
                             <div className="space-y-1">
@@ -451,6 +518,17 @@ export default function App() {
                         ))
                       )}
                     </div>
+                  </div>
+
+                  {/* Social Buzz Section - Added to main screen (Max 4 reels) */}
+                  <div className="mt-40 border-t-8 border-black pt-24">
+                    {trendingReels.length > 0 ? (
+                      <SocialReels recommendations={trendingReels} />
+                    ) : (
+                      <div className="text-center opacity-40 font-mono text-xs uppercase tracking-widest p-12 border-4 border-black border-dashed bg-neutral-50 animate-pulse">
+                        SCANNING LIVE PLATFORMS...
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -488,9 +566,11 @@ export default function App() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-20"
+                  className="mt-20 flex flex-col items-center justify-center border-4 border-black border-dashed bg-neutral-50 p-12 text-center brutal-shadow-sm"
                 >
-                  <SocialReels recommendations={[]} isLoading={true} />
+                  <RefreshCw className="w-12 h-12 text-[#FF007F] animate-spin mb-4" />
+                  <p className="font-masala text-2xl uppercase tracking-wider">PREPARING YOUR SHOWTIME DISH...</p>
+                  <p className="text-xs uppercase font-mono tracking-widest text-black/50 mt-1">THE MASALA ENGINE IS CURATING BEST MATCHES...</p>
                 </motion.div>
               )}
 
@@ -544,11 +624,9 @@ export default function App() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 pt-12">
                 {results.map((item, idx) => (
-                  <RecommendationCard key={item.name} item={item} index={idx} />
+                  <RecommendationCard key={item.name} item={item} index={idx} contentType={prefs.type} />
                 ))}
               </div>
-
-              <SocialReels recommendations={results} />
 
               <div className="flex justify-center pt-20">
                 <button
@@ -567,9 +645,26 @@ export default function App() {
       </main>
 
       <footer className="relative z-10 p-12 flex justify-between items-center border-t-4 border-black font-black text-xs uppercase tracking-widest bg-white">
-        <span className="bg-black text-white px-2 py-1">BUILD V4.0 // GEMINI CORE</span>
-        <span>&copy; {new Date().getFullYear()} / GOOGLE AI STUDIO / GEMINI</span>
+        <span className="bg-black text-white px-2 py-1">BUILD V4.0 // MASALA ENGINE</span>
+        <span>&copy; {new Date().getFullYear()} / GOOGLE AI STUDIO / CINEMA</span>
       </footer>
+
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            key="back-to-top"
+            id="back-to-top-btn"
+            onClick={scrollToTop}
+            initial={{ opacity: 0, y: 30, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.8 }}
+            className="fixed bottom-8 right-8 z-[90] bg-[#FF007F] text-white p-4 border-4 border-black font-black brutal-shadow-sm hover:bg-[#FFFF00] hover:text-black hover:brutal-shadow transition-all hover:-translate-y-1 active:translate-y-0.5 active:shadow-none cursor-pointer flex items-center justify-center rounded-none"
+            aria-label="Back to Top"
+          >
+            <ArrowUp className="w-6 h-6 stroke-[3]" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -3,11 +3,13 @@ import { Clapperboard, MonitorPlay, Instagram, Youtube, Play } from "lucide-reac
 import { motion } from "motion/react";
 import { Recommendation } from "../types";
 import { cn } from "../lib/utils";
+import { BrutalImage } from "./BrutalImage";
 
 export const RecommendationCard: React.FC<{
   item: Recommendation;
   index: number;
-}> = ({ item, index }) => {
+  contentType?: "movie" | "series";
+}> = ({ item, index, contentType = "movie" }) => {
   const colors = ['bg-[#FFFF00]', 'bg-[#FF007F]', 'bg-[#00FF00]', 'bg-[#00FFFF]', 'bg-[#FF9D00]'];
   const bgColor = colors[index % colors.length];
 
@@ -34,11 +36,15 @@ export const RecommendationCard: React.FC<{
         <div className="absolute top-0 left-0 right-0 h-4 film-strip-edge bg-white/20 z-10" />
         <div className="absolute bottom-0 left-0 right-0 h-4 film-strip-edge bg-white/20 z-10" />
         
-        <img 
-          src={`https://loremflickr.com/800/600/cinema,bollywood,movie,${encodeURIComponent(item.image_keywords || 'poster')}/all?lock=${index}`} 
+        <BrutalImage
+          srcs={[]}
           alt={item.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 brightness-90 group-hover:brightness-110 contrast-125"
-          referrerPolicy="no-referrer"
+          className="object-cover group-hover:scale-110 transition-all duration-700 brightness-90 group-hover:brightness-110 contrast-125"
+          aspectRatioClass="w-full h-full"
+          fallbackText={item.name}
+          index={index}
+          movieTitle={item.name}
+          contentType={contentType}
         />
         
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-4">

@@ -1,6 +1,9 @@
 {
   "name": "react-example",
   "private": true,
+  "overrides": {
+    "node-domexception": "file:node-domexception-stub"
+  },
   "version": "0.0.0",
   "type": "module",
   "scripts": {

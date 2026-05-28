@@ -16,7 +16,7 @@ export async function getTrendingSocialVibes(): Promise<TrendingData> {
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3.5-flash",
       contents: `
         You are the "Masala Cine-Intelligence" expert. 
         Identify 6 of the most robust and culturally significant "Cinematic Vibes" trending today (May 2026).
@@ -85,7 +85,7 @@ export async function getRecommendations(prefs: UserPreferences): Promise<Recomm
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3.5-flash",
       contents: `
         You are the "Masala Engine," a world-class cinema expert.
         User Environment:

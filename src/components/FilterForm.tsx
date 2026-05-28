@@ -37,7 +37,7 @@ export function FilterForm({ prefs, onUpdate, onSubmit, isLoading }: FilterFormP
       {/* Type & Age */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="space-y-6">
-          <label className={labelClasses}>CHOOSE TYPE</label>
+          <label className={labelClasses}>CHOOSE TYPE <span className="text-[#00FF00] font-black ml-2 text-[10px] bg-black px-1.5 py-0.5 border border-[#00FF00]">(REQUIRED *)</span></label>
           <div className="flex gap-4">
             {(['movie', 'series'] as ContentType[]).map((type) => (
               <button
@@ -57,7 +57,7 @@ export function FilterForm({ prefs, onUpdate, onSubmit, isLoading }: FilterFormP
         </div>
 
         <div className="space-y-6">
-          <label className={labelClasses}>WHICH AUDIENCE?</label>
+          <label className={labelClasses}>WHICH AUDIENCE? <span className="text-[#00FF00] font-black ml-2 text-[10px] bg-black px-1.5 py-0.5 border border-[#00FF00]">(REQUIRED *)</span></label>
           <div className="relative">
             <select
               value={prefs.ageRange}
@@ -75,7 +75,7 @@ export function FilterForm({ prefs, onUpdate, onSubmit, isLoading }: FilterFormP
 
       {/* Languages */}
       <div className="space-y-6">
-        <label className={labelClasses}>SELECT LANGUAGES</label>
+        <label className={labelClasses}>SELECT LANGUAGES <span className="text-[#FF007F] font-black ml-2 text-[11px] bg-black px-1.5 py-0.5 border border-[#FF007F] animate-pulse">(REQUIRED * MUST SELECT AT LEAST ONE)</span></label>
         <div className="flex flex-wrap gap-4">
           {LANGUAGES.map(lang => (
             <button
